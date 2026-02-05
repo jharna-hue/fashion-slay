@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fashion Slay</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; color: #333; }
+        header { background-color: #ff69b4; color: white; padding: 1rem; text-align: center; }
+        nav { background-color: #333; padding: 0.5rem; }
+        nav a { color: white; margin: 0 1rem; text-decoration: none; }
+        nav a:hover { text-decoration: underline; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .item { border: 1px solid #ddd; padding: 1rem; margin: 1rem 0; background: white; display: flex; align-items: center; }
+        .item img { max-width: 150px; margin-right: 1rem; }
+        form { display: flex; flex-direction: column; max-width: 400px; }
+        input, textarea, button { margin: 0.5rem 0; padding: 0.5rem; }
+        button { background-color: #ff69b4; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #ff1493; }
+        .hidden { display: none; }
+        @media (max-width: 768px) { .item { flex-direction: column; } }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Fashion Slay</h1>
+        <p>Slay the fashion game with our trendy clothes!</p>
+    </header>
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#shop">Shop</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+        <a href="#admin">Admin</a>
+    </nav>
+
+    <div id="home" class="container">
+        <h2>Welcome to Fashion Slay</h2>
+        <p>Discover the latest in fashion that empowers you to slay every day. Our collection features bold, stylish pieces for every occasion.</p>
+    </div>
+
+    <div id="shop" class="container hidden">
+        <h2>Shop Our Collection</h2>
+        <div id="items-list"></div>
+    </div>
+
+    <div id="about" class="container hidden">
+        <h2>About Us</h2>
+        <p>Fashion Slay is dedicated to providing high-quality, affordable clothing that makes you feel confident and stylish. Founded in 2023, we focus on trendy designs inspired by the latest runway trends.</p>
+    </div>
+
+    <div id="contact" class="container hidden">
+        <h2>Contact Us</h2>
+        <form id="contact-form">
+            <input type="text" placeholder="Your Name" required>
+            <input type="email" placeholder="Your Email" required>
+            <textarea placeholder="Your Message" required></textarea>
+            <button type="submit">Send Message</button>
+        </form>
+    </div>
+
+    <div id="admin" class="container hidden">
+        <h2>Admin Panel</h2>
+        <p>Enter password to access:</p>
+        <input type="password" id="admin-password">
+        <button onclick="checkPassword()">Login</button>
+        <div id="admin-content" class="hidden">
+            <h3>Add New Item</h3>
+            <form id="add-item-form">
+                <input type="text" id="item-name" placeholder="Item Name" required>
+                <input type="url" id="item-image" placeholder="Image URL" required>
+                <input type="number" id="item-price" placeholder="Price ($)" step="0.01" required>
+                <textarea id="item-description" placeholder="Description" required></textarea>
+                <button type="submit">Add Item</button>
+            </form>
+            <h3>Current Items</h3>
+            <div id="admin-items-list"></div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation
+        const sections = document.querySelectorAll('.container');
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                sections.forEach(sec => sec.classList.add('hidden'));
+                document.getElementById(link.getAttribute('href').substring(1)).classList.remove('hidden');
+            });
+        });
+
+        // Load items from localStorage
+        let items = JSON.parse(localStorage.getItem('fashionSlayItems')) || [];
+        function displayItems() {
+            const list = document.getElementById('items-list');
+            const adminList = document.getElementById('admin-items-list');
+            list.innerHTML = '';
+            adminList.innerHTML = '';
+            items.forEach((item, index) => {
+                const itemDiv = `<div class="item">
+                    <img src="${item.image}" alt="${item.name}">
+                    <div>
+                        <h3>${item.name}</h3>
+                        <p>${item.description}</p>
+                        <p>Price: $${item.price}</p>
+                    </div>
+                </div>`;
+                list.innerHTML += itemDiv;
+                adminList.innerHTML += itemDiv + `<button onclick="deleteItem(${index})">Delete</button>`;
+            });
+        }
+        displayItems();
+
+        // Add item
+        document.getElementById('add-item-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('item-name').value;
+            const image = document.getElementById('item-image').value;
+            const price = document.getElementById('item-price').value;
+            const description = document.getElementById('item-description').value;
+            items.push({ name, image, price, description });
+            localStorage.setItem('fashionSlayItems', JSON.stringify(items));
+            displayItems();
+            e.target.reset();
+        });
+
+        // Delete item
+        function deleteItem(index) {
+            items.splice(index, 1);
+            localStorage.setItem('fashionSlayItems', JSON.stringify(items));
+            displayItems();
+        }
+
+        // Admin password
+        function checkPassword() {
+            if (document.getElementById('admin-password').value === 'admin123') {
+                document.getElementById('admin-content').classList.remove('hidden');
+            } else {
+                alert('Incorrect password');
+            }
+        }
+
+        // Contact form
+        document.getElementById('contact-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Message sent! (This is a demo; integrate with a backend for real functionality.)');
+            e.target.reset();
+        });
+    </script>
+</body>
+</html>
